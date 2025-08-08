@@ -623,4 +623,4 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
       </div>
     </div>
   );
-}));
+});
