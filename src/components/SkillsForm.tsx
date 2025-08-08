@@ -72,16 +72,16 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({ skills, onChange }) => {
             type="text"
             value={newSkill}
             onChange={e => setNewSkill(e.target.value)}
-            placeholder="Add a skill"
-            className="flex-1 min-w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            placeholder="Add a skill..."
+            className="flex-1 min-w-48 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             onKeyDown={e => e.key === 'Enter' && addSkill()}
           />
-          <button
+          {/* <button
             onClick={addSkill}
             className="pr-3 pl-2 py-1.5 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-900 transition-colors flex items-center gap-1"
           >
             <Plus className="w-4 h-4" /> Add
-          </button>
+          </button> */}
         </div>
         <div className="grid gap-3">
           {skillsList.map(skill => (
@@ -152,16 +152,16 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({ skills, onChange }) => {
             type="text"
             value={newTech}
             onChange={e => setNewTech(e.target.value)}
-            placeholder="Add a technology/tool"
-            className="flex-1 min-w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            placeholder="Add technology/tool..."
+            className="flex-1 min-w-48 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             onKeyDown={e => e.key === 'Enter' && addTech()}
           />
-          <button
+          {/* <button
             onClick={addTech}
             className="pr-3 pl-2 py-1.5 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-900 transition-colors flex items-center gap-1"
           >
             <Plus className="w-4 h-4" /> Add
-          </button>
+          </button> */}
         </div>
         <div className="grid gap-3">
           {technologiesList.map(tech => (

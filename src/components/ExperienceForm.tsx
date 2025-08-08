@@ -74,7 +74,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
       <div className="flex justify-end">
         <button
           onClick={addExperience}
-          className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+          className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors text-sm"
         >
           <Plus className="w-4 h-4" />
           Add Experience
@@ -90,7 +90,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <h4 className="font-medium text-gray-900">
+                  <h4 className="font-medium text-sm text-gray-900">
                     {experience.position || 'New Position'} 
                     {experience.company && ` at ${experience.company}`}
                   </h4>
