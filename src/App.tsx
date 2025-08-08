@@ -7,11 +7,12 @@ import { ViewResumePage } from './components/ViewResumePage';
 import { ResumeData, TailoredResume, PersonalInfo, Experience, Education, Skill, Certification, Language } from './types/resume';
 import { ResumeService } from './services/resumeService';
 import { supabase } from './lib/supabase';
-import { FileText, LogOut, User as UserIcon, Download, ArrowLeft } from 'lucide-react';
+import { FileText, LogOut, User as UserIcon, Download, ArrowLeft, Shield } from 'lucide-react';
 import { User } from '@supabase/supabase-js';
 import html2pdf from 'html2pdf.js';
+import { SecurityTest } from './components/SecurityTest';
 
-type AppScreen = 'home' | 'candidate-details' | 'create-resume' | 'view-resume';
+type AppScreen = 'home' | 'candidate-details' | 'create-resume' | 'view-resume' | 'security-test';
 
 const initialPersonalInfo: PersonalInfo = {
   fullName: '',
@@ -75,8 +76,12 @@ function App() {
       ]);
       setResumeData(resumeData);
       setTailoredResumes(tailoredResumes);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading data:', error);
+      // If authentication error, redirect to auth
+      if (error.message?.includes('not authenticated')) {
+        await supabase.auth.signOut();
+      }
     } finally {
       setLoading(false);
     }
@@ -165,6 +170,11 @@ function App() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    // Clear cached data
+    ResumeService.clearCache();
+    setResumeData(initialResumeData);
+    setTailoredResumes([]);
+    setCurrentScreen('home');
   };
 
   const handleSaveAll = async () => {
@@ -306,6 +316,7 @@ function App() {
                         <UserIcon className="w-4 h-4" />
                         Details
                       </button>
+                      
                       <button
                         onClick={handleStartCreateResume}
                         className="flex items-center gap-2 px-4 py-2 font-regular bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-colors"
@@ -426,6 +437,10 @@ function App() {
                 saveRef={saveRef}
                 exportPdfRef={exportPdfRef}
               />
+            )}
+
+            {currentScreen === 'security-test' && (
+              <SecurityTest />
             )}
           </div>
         </div>

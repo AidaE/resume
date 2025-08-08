@@ -64,6 +64,12 @@ export const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    // Clear any cached data when user signs out
+    if (typeof window !== 'undefined') {
+      // Clear any localStorage or sessionStorage if used
+      localStorage.clear();
+      sessionStorage.clear();
+    }
   };
 
   if (loading) {

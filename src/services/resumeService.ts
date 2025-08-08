@@ -4,36 +4,43 @@ import { ResumeData, TailoredResume, PersonalInfo, Experience, Education, Skill,
 export class ResumeService {
   private static candidateId: string | null = null;
 
-  static async ensureCandidate(): Promise<string> {
+  // Utility method to validate user authentication
+  private static async validateUser(): Promise<string> {
     const { data: { user } } = await supabase.auth.getUser();
-    console.log('DEBUG ensureCandidate user.id:', user?.id); // Debug log
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      throw new Error('User not authenticated. Please sign in to continue.');
+    }
+    return user.id;
+  }
 
+  static async ensureCandidate(): Promise<string> {
+    await this.validateUser();
+    
     if (this.candidateId) return this.candidateId;
 
-    // Check if candidate exists
-    const { data: existingCandidates } = await supabase
+    // Use upsert to handle race conditions
+    const { data: candidate, error } = await supabase
       .from('candidates')
-      .select('id')
-      .eq('user_id', user.id);
-
-    if (existingCandidates && existingCandidates.length > 0) {
-      const id = existingCandidates[0].id;
-      if (!id || typeof id !== 'string') throw new Error('Invalid candidate id');
-      this.candidateId = id;
-      return this.candidateId;
-    }
-
-    // Create new candidate
-    const { data: newCandidate, error } = await supabase
-      .from('candidates')
-      .insert({ user_id: user.id })
+      .upsert(
+        { user_id: (await this.validateUser()) },
+        { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false 
+        }
+      )
       .select('id')
       .single();
 
-    if (error) throw error;
-    if (!newCandidate.id || typeof newCandidate.id !== 'string') throw new Error('Invalid new candidate id');
-    this.candidateId = newCandidate.id;
+    if (error) {
+      console.error('Error ensuring candidate:', error);
+      throw new Error('Failed to create or retrieve candidate profile');
+    }
+
+    if (!candidate?.id || typeof candidate.id !== 'string') {
+      throw new Error('Invalid candidate id returned from database');
+    }
+
+    this.candidateId = candidate.id;
     return this.candidateId;
   }
 
@@ -230,14 +237,64 @@ export class ResumeService {
     }
   }
 
+  static async saveCertifications(certifications: Certification[]): Promise<void> {
+    const candidateId = await this.ensureCandidate();
+
+    // Delete existing certifications
+    await supabase.from('certifications').delete().eq('candidate_id', candidateId);
+
+    if (certifications.length === 0) return;
+
+    // Insert new certifications
+    const { error } = await supabase
+      .from('certifications')
+      .insert(certifications.map(cert => ({
+        id: cert.id,
+        candidate_id: candidateId,
+        name: cert.name,
+        issuer: cert.issuer,
+        date: cert.date,
+        expiry_date: cert.expiryDate || null,
+        credential_id: cert.credentialId || null
+      })));
+
+    if (error) {
+      console.error('DEBUG saveCertifications error:', error);
+      throw error;
+    }
+  }
+
+  static async saveLanguages(languages: Language[]): Promise<void> {
+    const candidateId = await this.ensureCandidate();
+
+    // Delete existing languages
+    await supabase.from('languages').delete().eq('candidate_id', candidateId);
+
+    if (languages.length === 0) return;
+
+    // Insert new languages
+    const { error } = await supabase
+      .from('languages')
+      .insert(languages.map(lang => ({
+        id: lang.id,
+        candidate_id: candidateId,
+        name: lang.name,
+        proficiency: lang.proficiency
+      })));
+
+    if (error) {
+      console.error('DEBUG saveLanguages error:', error);
+      throw error;
+    }
+  }
+
   static async saveResumeData(resumeData: ResumeData): Promise<void> {
     await this.savePersonalInfo(resumeData.personalInfo);
     await this.saveExperiences(resumeData.experiences);
     await this.saveEducation(resumeData.education);
     await this.saveSkills(resumeData.skills);
-    // Optionally add certifications, languages if needed
-    // await this.saveCertifications(resumeData.certifications);
-    // await this.saveLanguages(resumeData.languages);
+    await this.saveCertifications(resumeData.certifications);
+    await this.saveLanguages(resumeData.languages);
   }
 
   static async loadTailoredResumes(): Promise<TailoredResume[]> {
@@ -291,5 +348,10 @@ export class ResumeService {
       .eq('id', id);
 
     if (error) throw error;
+  }
+
+  // Clear cached candidate ID when user signs out
+  static clearCache(): void {
+    this.candidateId = null;
   }
 }
