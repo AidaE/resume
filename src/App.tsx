@@ -328,21 +328,22 @@ function App() {
                   )}
                   {(currentScreen === 'create-resume' || currentScreen === 'view-resume') && (
                     <>
-                      <button
-                        onClick={() => saveRef.current && saveRef.current()}
-                        className="flex items-center gap-2 px-6 py-2 bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-colors shadow-sm"
-                        title="Save Changes"
-                      >
-                        Save Changes
-                      </button>
-                      <button
+                     <button
                         onClick={() => exportPdfRef.current && exportPdfRef.current()}
-                        className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-sm"
+                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-xl hover:bg-gray-100 transition-colors shadow-sm"
                         title="Export as PDF"
                       >
                         <Download className="w-4 h-4" />
                         Export PDF
                       </button>
+                      <button
+                        onClick={() => saveRef.current && saveRef.current()}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-colors shadow-sm"
+                        title="Save Changes"
+                      >
+                        Save Changes
+                      </button>
+                     
                     </>
                   )}
                   {saving && (
@@ -351,12 +352,14 @@ function App() {
                       Saving...
                     </div>
                   )}
-                  <button
-                    onClick={handleSignOut}
-                    className="flex items-center gap-2 px-1.5 py-1.5 text-sm rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                  </button>
+                  {currentScreen !== 'create-resume' && currentScreen !== 'view-resume' && (
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-2 px-1.5 py-1.5 text-sm rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

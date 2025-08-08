@@ -20,7 +20,7 @@ interface JobDetailsFormProps {
   onCompanyChange: (val: string) => void;
   onJobDescriptionChange: (val: string) => void;
 }
-const JobDetailsForm: React.FC<JobDetailsFormProps> = ({ jobTitle, company, jobDescription, onJobTitleChange, onCompanyChange, onJobDescriptionChange }) => {
+const JobDetailsForm: React.FC<JobDetailsFormProps & { jobDescEdited: boolean; setJobDescEdited: (v: boolean) => void }> = ({ jobTitle, company, jobDescription, onJobTitleChange, onCompanyChange, onJobDescriptionChange, jobDescEdited, setJobDescEdited }) => {
   const [localJobTitle, setLocalJobTitle] = useState(jobTitle);
   const [localCompany, setLocalCompany] = useState(company);
   const [localJobDescription, setLocalJobDescription] = useState(jobDescription);
@@ -29,41 +29,38 @@ const JobDetailsForm: React.FC<JobDetailsFormProps> = ({ jobTitle, company, jobD
   useEffect(() => { setLocalJobDescription(jobDescription); }, [jobDescription]);
   return (
     <>
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="flex flex-col gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
-          <div className="relative">
-            <FileText className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={localJobTitle}
-              onChange={e => setLocalJobTitle(e.target.value)}
-              onBlur={() => onJobTitleChange(localJobTitle)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              placeholder="e.g. Senior Software Engineer"
-            />
-          </div>
+          <input
+            type="text"
+            value={localJobTitle}
+            onChange={e => setLocalJobTitle(e.target.value)}
+            onBlur={() => onJobTitleChange(localJobTitle)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            placeholder="e.g. Senior Software Engineer"
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
-          <div className="relative">
-            <Building className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={localCompany}
-              onChange={e => setLocalCompany(e.target.value)}
-              onBlur={() => onCompanyChange(localCompany)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              placeholder="e.g. TechCorp Inc."
-            />
-          </div>
+          <input
+            type="text"
+            value={localCompany}
+            onChange={e => setLocalCompany(e.target.value)}
+            onBlur={() => onCompanyChange(localCompany)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            placeholder="e.g. TechCorp Inc."
+          />
         </div>
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Job Description</label>
         <textarea
           value={localJobDescription}
-          onChange={e => setLocalJobDescription(e.target.value)}
+          onChange={e => {
+            setLocalJobDescription(e.target.value);
+            setJobDescEdited(true);
+          }}
           onBlur={() => onJobDescriptionChange(localJobDescription)}
           rows={8}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
@@ -129,6 +126,7 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<string>('');
   const [isSummaryLoading, setIsSummaryLoading] = useState<boolean>(false);
+  const [jobDescEdited, setJobDescEdited] = useState(false);
 
   // Expand/collapse state for each section
   const [expandedSections, setExpandedSections] = useState({
@@ -186,7 +184,8 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
 
   const generatePreview = async () => {
     if (!resumeTitle.trim()) return;
-    
+    // Always update the professional summary before generating preview
+    await handleGenerateSummary();
     setIsGenerating(true);
     
     // Extract keywords from job description
@@ -512,14 +511,16 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
               onJobTitleChange={setJobTitle}
               onCompanyChange={setCompany}
               onJobDescriptionChange={setJobDescription}
+              jobDescEdited={jobDescEdited}
+              setJobDescEdited={setJobDescEdited}
             />
           </ExpandableSection>
           {/* Actions (Generate Preview, etc.) remain outside sections */}
           <div className="flex gap-3 pt-4">
             <button
               onClick={generatePreview}
-              disabled={!resumeTitle.trim() || isGenerating || isProfileIncomplete}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              disabled={!resumeTitle.trim() || isGenerating || isProfileIncomplete || !jobDescEdited}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-xl hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
               {isGenerating ? (
                 <>
@@ -529,10 +530,11 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  Generate Preview
+                   Regenerate
                 </>
               )}
             </button>
+            {/* 
             <button onClick={handleGenerate} disabled={loading || !candidate} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
               {loading ? (
                 <>
@@ -542,27 +544,12 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
               ) : (
                 <>
                   <Target className="w-4 h-4" />
-                  Auto-Generate Sections
+                  Sections
                 </>
               )}
-            </button>
+            </button> */}
           </div>
-          {isGenerating && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-              <div className="flex items-start gap-3">
-                <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-medium text-blue-900 mb-1">AI is analyzing the job description</h4>
-                  <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Extracting key skills and requirements</li>
-                    <li>• Matching with your experience and skills</li>
-                    <li>• Prioritizing relevant experiences</li>
-                    <li>• Generating tailored content</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          )}
+          
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
               <div className="flex items-start gap-3">
@@ -587,7 +574,7 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
               </div>
             </div>
           )}
-          {(summary || isSummaryLoading) && (
+          {/* {(summary || isSummaryLoading) && (
             <div className="mb-4">
               <h2 className="text-lg font-semibold text-gray-900 mb-2">Professional Summary</h2>
               {isSummaryLoading ? (
@@ -596,7 +583,7 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
                 <p className="text-gray-800 whitespace-pre-line">{summary}</p>
               )}
             </div>
-          )}
+          )} */}
         </div>
         {/* Right Column: Resume Preview */}
         <div className="flex-1 min-w-0 max-w-[900px] ml-[340px] flex items-start justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 h-[calc(100vh-64px)] overflow-auto">
