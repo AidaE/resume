@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Skill } from '../types/resume';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Pencil } from 'lucide-react';
 
 interface SkillsFormProps {
   skills: Skill[];
@@ -12,6 +12,9 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({ skills, onChange }) => {
   const [technologiesList, setTechnologiesList] = useState<Skill[]>([]);
   const [newSkill, setNewSkill] = useState('');
   const [newTech, setNewTech] = useState('');
+  const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
+  const [editingTechId, setEditingTechId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState('');
   const didInit = useRef(false);
 
   // Only update local state from props on initial mount
@@ -75,18 +78,65 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({ skills, onChange }) => {
           />
           <button
             onClick={addSkill}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
+            className="pr-3 pl-2 py-1.5 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-900 transition-colors flex items-center gap-1"
           >
             <Plus className="w-4 h-4" /> Add
           </button>
         </div>
         <div className="grid gap-3">
           {skillsList.map(skill => (
-            <div key={skill.id} className="flex items-center justify-between p-3 bg-white rounded-lg min-w-0">
-              <span className="font-medium text-gray-900">{skill.name}</span>
+            <div key={skill.id} className="flex items-center justify-between py-2 px-3 bg-white rounded-lg min-w-0">
+              {editingSkillId === skill.id ? (
+                <input
+                  type="text"
+                  className="font-medium text-sm text-gray-900 flex-1 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={editingValue}
+                  autoFocus
+                  onChange={e => setEditingValue(e.target.value)}
+                  onBlur={() => {
+                    const trimmed = editingValue.trim();
+                    if (trimmed && trimmed !== skill.name) {
+                      const nextSkills = skillsList.map(s => s.id === skill.id ? { ...s, name: trimmed } : s);
+                      setSkillsList(nextSkills);
+                      syncToParent(nextSkills, technologiesList);
+                    }
+                    setEditingSkillId(null);
+                  }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      const trimmed = editingValue.trim();
+                      if (trimmed && trimmed !== skill.name) {
+                        const nextSkills = skillsList.map(s => s.id === skill.id ? { ...s, name: trimmed } : s);
+                        setSkillsList(nextSkills);
+                        syncToParent(nextSkills, technologiesList);
+                      }
+                      setEditingSkillId(null);
+                    } else if (e.key === 'Escape') {
+                      setEditingSkillId(null);
+                    }
+                  }}
+                />
+              ) : (
+                <span
+                  className="font-medium text-sm text-gray-900 flex-1 group cursor-pointer flex items-center"
+                  onClick={() => {
+                    setEditingSkillId(skill.id);
+                    setEditingValue(skill.name);
+                  }}
+                >
+                  {skill.name}
+                  <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Pencil className="w-3 h-3 text-gray-300 hover:text-gray-500" onClick={e => {
+                      e.stopPropagation();
+                      setEditingSkillId(skill.id);
+                      setEditingValue(skill.name);
+                    }} />
+                  </span>
+                </span>
+              )}
               <button
                 onClick={() => removeSkill(skill.id)}
-                className="text-gray-400 hover:text-red-500 transition-colors"
+                className="text-gray-400 text-sm hover:text-red-500 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -108,15 +158,62 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({ skills, onChange }) => {
           />
           <button
             onClick={addTech}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
+            className="pr-3 pl-2 py-1.5 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-900 transition-colors flex items-center gap-1"
           >
             <Plus className="w-4 h-4" /> Add
           </button>
         </div>
         <div className="grid gap-3">
           {technologiesList.map(tech => (
-            <div key={tech.id} className="flex items-center justify-between p-3 bg-white rounded-lg min-w-0">
-              <span className="font-medium text-gray-900">{tech.name}</span>
+            <div key={tech.id} className="flex items-center justify-between px-3 py-2 bg-white rounded-lg min-w-0">
+              {editingTechId === tech.id ? (
+                <input
+                  type="text"
+                  className="font-medium text-sm text-gray-900 flex-1 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={editingValue}
+                  autoFocus
+                  onChange={e => setEditingValue(e.target.value)}
+                  onBlur={() => {
+                    const trimmed = editingValue.trim();
+                    if (trimmed && trimmed !== tech.name) {
+                      const nextTechs = technologiesList.map(t => t.id === tech.id ? { ...t, name: trimmed } : t);
+                      setTechnologiesList(nextTechs);
+                      syncToParent(skillsList, nextTechs);
+                    }
+                    setEditingTechId(null);
+                  }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      const trimmed = editingValue.trim();
+                      if (trimmed && trimmed !== tech.name) {
+                        const nextTechs = technologiesList.map(t => t.id === tech.id ? { ...t, name: trimmed } : t);
+                        setTechnologiesList(nextTechs);
+                        syncToParent(skillsList, nextTechs);
+                      }
+                      setEditingTechId(null);
+                    } else if (e.key === 'Escape') {
+                      setEditingTechId(null);
+                    }
+                  }}
+                />
+              ) : (
+                <span
+                  className="font-medium text-sm text-gray-900 flex-1 group cursor-pointer flex items-center"
+                  onClick={() => {
+                    setEditingTechId(tech.id);
+                    setEditingValue(tech.name);
+                  }}
+                >
+                  {tech.name}
+                  <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Pencil className="w-3 h-3 text-gray-300 hover:text-gray-500" onClick={e => {
+                      e.stopPropagation();
+                      setEditingTechId(tech.id);
+                      setEditingValue(tech.name);
+                    }} />
+                  </span>
+                </span>
+              )}
               <button
                 onClick={() => removeTech(tech.id)}
                 className="text-gray-400 hover:text-red-500 transition-colors"
