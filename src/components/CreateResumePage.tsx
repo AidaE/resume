@@ -465,9 +465,9 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
           </div>
         </div>
       )}
-      <div className="flex h-[calc(100vh-120px)]">
+      <div className="flex h-[calc(100vh-64px)]">
         {/* Left Column: Resume Title, Candidate Details, Job Details, Actions */}
-        <div className="w-[340px] bg-white border-r border-gray-200 p-4 shadow-sm space-y-4 pt-1 flex-shrink-0 overflow-y-auto">
+        <div className="w-[340px] bg-white border-r border-gray-200 shadow-sm space-y-4 flex-shrink-0 overflow-y-auto fixed left-0 top-[64px] bottom-0 h-[calc(100vh-64px)] p-6">
           {/* Resume Title (always visible, not expandable) */}
            
           {/* Resume Title (always visible, or could be collapsible if desired) */}
@@ -599,26 +599,28 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
           )}
         </div>
         {/* Right Column: Resume Preview */}
-        <div className="flex-1 min-w-0 max-w-[900px]">
-          {fetchingCandidate ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              <span className="ml-3 text-lg text-gray-600">Loading candidate details...</span>
-            </div>
-          ) : (
-            <ResumePreview
-              resumeData={{
-                ...resumeData,
-                personalInfo,
-                education,
-                experiences,
-                skills
-              }}
-              jobTitle={jobTitle}
-              company={company}
-              matchedSkills={previewData?.matchedSkills || []}
-            />
-          )}
+        <div className="flex-1 min-w-0 max-w-[900px] ml-[340px] flex items-start justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 h-[calc(100vh-64px)] overflow-auto">
+          <div className="w-full max-w-3xl bg-white border border-gray-200 rounded-2xl shadow-lg p-8 mt-0 mb-8 flex items-center justify-center min-h-[80vh]">
+            {fetchingCandidate ? (
+              <div className="flex items-center justify-center h-full w-full">
+                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <span className="ml-3 text-lg text-gray-600">Loading candidate details...</span>
+              </div>
+            ) : (
+              <ResumePreview
+                resumeData={{
+                  ...resumeData,
+                  personalInfo,
+                  education,
+                  experiences,
+                  skills
+                }}
+                jobTitle={jobTitle}
+                company={company}
+                matchedSkills={previewData?.matchedSkills || []}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
