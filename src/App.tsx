@@ -232,9 +232,9 @@ function App() {
       {showJobDescModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-semibold mb-2">Enter Job Description</h2>
+            <h2 className="text-lg font-semibold mb-4">Enter a job description to generate a tailored resume</h2>
             <textarea
-              className="w-full border border-gray-300 rounded p-2 mb-4"
+              className="w-full border border-gray-300 rounded-xl p-2 mb-4"
               rows={6}
               value={jobDescForResume}
               onChange={e => setJobDescForResume(e.target.value)}
@@ -242,13 +242,13 @@ function App() {
             />
             <div className="flex justify-end gap-2">
               <button
-                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300"
                 onClick={() => handleJobDescModalDone('')}
               >
                 Skip
               </button>
               <button
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="px-4 py-2 bg-gray-800 text-white rounded-xl hover:bg-gray-900"
                 onClick={() => handleJobDescModalDone(jobDescForResume)}
               >
                 Continue
