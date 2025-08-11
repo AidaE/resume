@@ -37,25 +37,7 @@ export const CandidateDetailsPage: React.FC<CandidateDetailsPageProps> = ({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 px-3 py-1.5 text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Candidate Details</h1>
-          <p className="text-gray-600">Manage your global resume information</p>
-        </div>
-        <button
-          onClick={onSave}
-          className="ml-auto px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition-colors font-medium"
-        >
-          Save
-        </button>
-      </div>
+      
 
       <div className="flex gap-6">
         {/* Section Navigation */}

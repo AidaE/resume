@@ -17,6 +17,7 @@ export interface Experience {
   description: string;
   achievements: string[];
   skills: string[];
+  location: string;
 }
 
 export interface Education {
@@ -27,6 +28,7 @@ export interface Education {
   graduationDate: string;
   gpa?: string;
   honors?: string;
+  location: string;
 }
 
 export interface Skill {

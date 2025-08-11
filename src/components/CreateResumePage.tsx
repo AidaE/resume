@@ -31,30 +31,30 @@ const JobDetailsForm: React.FC<JobDetailsFormProps & { jobDescEdited: boolean; s
     <>
       <div className="flex flex-col gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
+          <label className="block text-xs font-medium text-gray-700 mb-1">Job Title</label>
           <input
             type="text"
             value={localJobTitle}
             onChange={e => setLocalJobTitle(e.target.value)}
             onBlur={() => onJobTitleChange(localJobTitle)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             placeholder="e.g. Senior Software Engineer"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
+          <label className="block text-xs font-medium text-gray-700 mb-1">Company</label>
           <input
             type="text"
             value={localCompany}
             onChange={e => setLocalCompany(e.target.value)}
             onBlur={() => onCompanyChange(localCompany)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             placeholder="e.g. TechCorp Inc."
           />
         </div>
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Job Description</label>
+        <label className="block text-xs font-medium text-gray-700 mb-1 mt-4">Job Description</label>
         <textarea
           value={localJobDescription}
           onChange={e => {
@@ -63,7 +63,7 @@ const JobDetailsForm: React.FC<JobDetailsFormProps & { jobDescEdited: boolean; s
           }}
           onBlur={() => onJobDescriptionChange(localJobDescription)}
           rows={8}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+          className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
           placeholder="Paste the complete job description here. The AI will analyze this to tailor your resume..."
         />
         <p className="text-xs text-gray-500 mt-1">Include requirements, responsibilities, and preferred qualifications for best results.</p>

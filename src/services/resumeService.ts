@@ -86,7 +86,8 @@ export class ResumeService {
       current: exp.current,
       description: exp.description || '',
       achievements: exp.achievements || [],
-      skills: exp.skills || []
+      skills: exp.skills || [],
+      location: exp.location // Load location
     }));
 
     const skills: Skill[] = (skillsResult.data || []).map(skill => ({
@@ -103,7 +104,8 @@ export class ResumeService {
       field: edu.field,
       graduationDate: edu.graduation_date,
       gpa: edu.gpa || '',
-      honors: edu.honors || ''
+      honors: edu.honors || '',
+      location: edu.location // Load location
     }));
 
     const certifications: Certification[] = (certificationsResult.data || []).map(cert => ({
@@ -175,7 +177,8 @@ export class ResumeService {
         current: exp.current,
         description: exp.description,
         achievements: exp.achievements,
-        skills: exp.skills
+        skills: exp.skills,
+        location: exp.location // Save location
       })));
 
     if (error) {
@@ -228,7 +231,8 @@ export class ResumeService {
         field: edu.field,
         graduation_date: edu.graduationDate,
         gpa: edu.gpa || null,
-        honors: edu.honors || null
+        honors: edu.honors || null,
+        location: edu.location // Save location
       })));
 
     if (error) {

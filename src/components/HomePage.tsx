@@ -133,10 +133,10 @@ const CardWithMenu: FC<CardWithMenuProps> = ({ resume, onViewResume, onDeleteRes
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1">
+                {/* <div className="flex items-center gap-1">
                   <span className="w-2 h-2 bg-emerald-500 rounded-full" />
                   <span>{resume.matchedSkills.length} skills matched</span>
-                </div>
+                </div> */}
               </div>
 
               {/* Skill tags */}

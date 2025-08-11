@@ -220,7 +220,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -258,77 +258,57 @@ function App() {
         </div>
       )}
       <AuthWrapper>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="min-h-screen bg-gray-50">
           {/* Header */}
           <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
-            <div className="w-full px-4 py-4">
+            <div className="w-full px-8 py-4">
               <div className="flex items-center justify-between">
-                {currentScreen === 'home' ? (
-                  <div className="flex items-center gap-1">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-gray-800" />
-                    </div>
-                    <div>
-                      <h1 className="text-lg font-medium text-gray-800">ResumeAI</h1>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-4">
+                {currentScreen === 'candidate-details' ? (
+                  <>
                     <button
                       onClick={handleBackToHome}
                       className="flex items-center gap-2 px-3 py-1.5 text-gray-600 hover:text-gray-900 transition-colors"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      
                     </button>
-                    {(currentScreen === 'create-resume' || currentScreen === 'view-resume') && (
-                      <div className="flex items-center gap-2">
-                        {isEditingResumeTitle ? (
-                          <input
-                            type="text"
-                            value={resumeTitle}
-                            onChange={(e) => setResumeTitle(e.target.value)}
-                            onBlur={() => setIsEditingResumeTitle(false)}
-                            onKeyDown={(e) => e.key === 'Enter' && setIsEditingResumeTitle(false)}
-                            className="text-lg font-medium text-gray-800 bg-transparent border-b border-gray-300 focus:outline-none focus:border-blue-500"
-                            autoFocus
-                          />
-                        ) : (
-                          <button
-                            onClick={() => setIsEditingResumeTitle(true)}
-                            className="text-lg font-medium text-gray-800 hover:text-blue-600 transition-colors"
-                          >
-                            {resumeTitle || 'Untitled Resume'}
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                <div className="flex items-center gap-4">
-                  {currentScreen === 'home' && (
-                    <>
+                    <h1 className="text-lg font-semibold text-gray-900 flex-1 text-left ml-4">General Details</h1>
+                    <button
+                      onClick={handleSaveAll}
+                      className="ml-4 px-4 py-2 bg-gray-800 text-white rounded-xl shadow-sm hover:bg-gray-900 transition-colors font-medium"
+                    >
+                      Save
+                    </button>
+                  </>
+                ) : (currentScreen === 'create-resume' || currentScreen === 'view-resume') ? (
+                  <>
+                    <button
+                      onClick={handleBackToHome}
+                      className="flex items-center gap-2 px-3 py-1.5 text-gray-600 hover:text-gray-900 transition-colors"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                    </button>
+                    <div className="flex-1 flex items-center">
+                      {isEditingResumeTitle ? (
+                        <input
+                          type="text"
+                          value={resumeTitle}
+                          onChange={(e) => setResumeTitle(e.target.value)}
+                          onBlur={() => setIsEditingResumeTitle(false)}
+                          onKeyDown={(e) => e.key === 'Enter' && setIsEditingResumeTitle(false)}
+                          className="text-lg font-medium text-gray-800 bg-transparent border-b border-gray-300 focus:outline-none focus:border-blue-500"
+                          autoFocus
+                        />
+                      ) : (
+                        <button
+                          onClick={() => setIsEditingResumeTitle(true)}
+                          className="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors"
+                        >
+                          {resumeTitle || 'Untitled Resume'}
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
                       <button
-                        onClick={() => setCurrentScreen('candidate-details')}
-                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-                      >
-                        <UserIcon className="w-4 h-4" />
-                        Details
-                      </button>
-                      
-                      <button
-                        onClick={handleStartCreateResume}
-                        className="flex items-center gap-2 px-4 py-2 font-regular bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-colors"
-                      >
-                        <FileText className="w-4 h-4" />
-                        Create resume
-                      </button>
-                    </>
-                  )}
-                  {(currentScreen === 'create-resume' || currentScreen === 'view-resume') && (
-                    <>
-                     <button
                         onClick={() => exportPdfRef.current && exportPdfRef.current()}
                         className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-xl hover:bg-gray-100 transition-colors shadow-sm"
                         title="Export as PDF"
@@ -343,7 +323,30 @@ function App() {
                       >
                         Save Changes
                       </button>
-                     
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <img src="/logo.png" alt="App Logo" className="w-8 h-8 object-contain rounded-xl" />
+                  </div>
+                )}
+                <div className="flex items-center gap-4">
+                  {currentScreen === 'home' && (
+                    <>
+                      <button
+                        onClick={() => setCurrentScreen('candidate-details')}
+                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                      >
+                        <UserIcon className="w-4 h-4" />
+                        Details
+                      </button>
+                      <button
+                        onClick={handleStartCreateResume}
+                        className="flex items-center gap-2 px-4 py-2 font-regular bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-colors"
+                      >
+                        <FileText className="w-4 h-4" />
+                        Create resume
+                      </button>
                     </>
                   )}
                   {saving && (
@@ -352,7 +355,7 @@ function App() {
                       Saving...
                     </div>
                   )}
-                  {currentScreen !== 'create-resume' && currentScreen !== 'view-resume' && (
+                  {!(currentScreen === 'create-resume' || currentScreen === 'view-resume' || currentScreen === 'candidate-details') && (
                     <button
                       onClick={handleSignOut}
                       className="flex items-center gap-2 px-1.5 py-1.5 text-sm rounded-lg hover:bg-gray-50 transition-colors"
@@ -385,7 +388,7 @@ function App() {
                 onEducationChange={handleEducationChange}
                 onSkillsChange={handleSkillsChange}
                 onBack={handleBackToHome}
-                onSave={handleSaveAll} // Pass the new handler
+                onSave={handleSaveAll}
               />
             )}
 

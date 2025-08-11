@@ -94,7 +94,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data, onChan
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-xs font-medium text-gray-700 mb-1">
           Professional Summary *
         </label>
         <textarea
@@ -102,7 +102,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data, onChan
           onChange={e => handleChange('summary', e.target.value)}
           onBlur={() => handleBlur('summary')}
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+          className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
           placeholder="Write a compelling professional summary that highlights your key strengths and career objectives..."
         />
         <p className="text-xs text-gray-500 mt-1">

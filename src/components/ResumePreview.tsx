@@ -105,6 +105,9 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
                     <div>
                       <h3 className="font-semibold text-gray-900">{exp.position}</h3>
                       <p className="text-blue-600 font-medium">{exp.company}</p>
+                      {exp.location && (
+                        <p className="text-sm text-gray-500">{exp.location}</p>
+                      )}
                     </div>
                     <p className="text-sm text-gray-500">
                       {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
@@ -159,6 +162,9 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
                     <div>
                       <h3 className="font-semibold text-gray-900">{edu.degree} in {edu.field}</h3>
                       <p className="text-blue-600 font-medium">{edu.institution}</p>
+                      {edu.location && (
+                        <p className="text-sm text-gray-500">{edu.location}</p>
+                      )}
                       {edu.gpa && <p className="text-sm text-gray-600">GPA: {edu.gpa}</p>}
                       {edu.honors && <p className="text-sm text-gray-600">{edu.honors}</p>}
                     </div>

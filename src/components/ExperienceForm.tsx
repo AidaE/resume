@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Experience } from '../types/resume';
 import { Briefcase, Plus, X, Calendar, Building } from 'lucide-react';
+// Remove react-datepicker and date-fns imports
 
 interface ExperienceFormProps {
   experiences: Experience[];
@@ -22,7 +23,8 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
       current: false,
       description: '',
       achievements: [''],
-      skills: []
+      skills: [],
+      location: '' // Added location
     };
     const newArr = [...localExps, newExperience];
     setLocalExps(newArr);
@@ -67,6 +69,66 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
       const newAchievements = experience.achievements.filter((_, i) => i !== index);
       updateExperience(expId, 'achievements', newAchievements);
     }
+  };
+
+  // Helper to parse YYYY-MM to Date
+  // Remove parseMonthYear and formatMonthYear functions
+
+  // Custom MonthYearPicker component
+  const MonthYearPicker: React.FC<{
+    value: string;
+    onChange: (val: string) => void;
+    disabled?: boolean;
+  }> = ({ value, onChange, disabled }) => {
+    const [open, setOpen] = useState(false);
+    const [year, setYear] = useState(() => {
+      if (value && /^\d{4}-\d{2}$/.test(value)) return parseInt(value.split('-')[0], 10);
+      return new Date().getFullYear();
+    });
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    const selectedMonth = value && /^\d{4}-\d{2}$/.test(value) ? parseInt(value.split('-')[1], 10) - 1 : null;
+    return (
+      <div className="relative">
+        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+        <input
+          type="text"
+          readOnly
+          value={value}
+          onClick={() => !disabled && setOpen(v => !v)}
+          className={`w-full text-sm pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white cursor-pointer ${disabled ? 'bg-gray-100 text-gray-400' : ''}`}
+          placeholder="YYYY-MM"
+          disabled={disabled}
+        />
+        {open && !disabled && (
+          <div className="absolute z-10 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 p-3" style={{ minWidth: 220 }}>
+            <div className="flex items-center justify-between mb-2">
+              <button className="px-2 py-1 text-gray-500 hover:text-gray-700" onClick={() => setYear(y => y - 1)}>&lt;</button>
+              <span className="font-semibold">{year}</span>
+              <button className="px-2 py-1 text-gray-500 hover:text-gray-700" onClick={() => setYear(y => y + 1)}>&gt;</button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {months.map((m, i) => (
+                <button
+                  key={m}
+                  className={`px-2 py-1 rounded text-sm ${selectedMonth === i && parseInt(value.split('-')[0], 10) === year ? 'bg-blue-600 text-white' : 'hover:bg-blue-100'}`}
+                  onClick={() => {
+                    onChange(`${year}-${String(i + 1).padStart(2, '0')}`);
+                    setOpen(false);
+                  }}
+                  type="button"
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+            <button className="mt-2 text-xs text-gray-500 hover:text-gray-700 underline" onClick={() => { onChange(''); setOpen(false); }}>Clear</button>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -114,7 +176,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
               <div className="p-4 space-y-4 border-t border-gray-200">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Job Title *
                     </label>
                     <input
@@ -122,57 +184,51 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
                       value={localExps.find(e => e.id === experience.id)?.position || ''}
                       onChange={e => updateExperience(experience.id, 'position', e.target.value)}
                       onBlur={() => blurExperience(experience.id)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                       placeholder="e.g. Senior Software Engineer"
                     />
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Company *
                     </label>
                     <div className="relative">
-                      <Building className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
                       <input
                         type="text"
                         value={localExps.find(e => e.id === experience.id)?.company || ''}
                         onChange={e => updateExperience(experience.id, 'company', e.target.value)}
                         onBlur={() => blurExperience(experience.id)}
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        className="w-full text-sm pl-3 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                         placeholder="e.g. TechCorp Inc."
                       />
                     </div>
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Start Date *
                     </label>
                     <div className="relative">
-                      <Calendar className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-                      <input
-                        type="month"
+                      <MonthYearPicker
                         value={localExps.find(e => e.id === experience.id)?.startDate || ''}
-                        onChange={e => updateExperience(experience.id, 'startDate', e.target.value)}
-                        onBlur={() => blurExperience(experience.id)}
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        onChange={val => {
+                          updateExperience(experience.id, 'startDate', val);
+                          blurExperience(experience.id);
+                        }}
                       />
                     </div>
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       End Date
                     </label>
                     <div className="relative">
-                      <Calendar className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-                      <input
-                        type="month"
+                      <MonthYearPicker
                         value={localExps.find(e => e.id === experience.id)?.endDate || ''}
-                        onChange={e => updateExperience(experience.id, 'endDate', e.target.value)}
-                        onBlur={() => blurExperience(experience.id)}
+                        onChange={val => {
+                          updateExperience(experience.id, 'endDate', val);
+                          blurExperience(experience.id);
+                        }}
                         disabled={localExps.find(e => e.id === experience.id)?.current}
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-100"
                       />
                     </div>
                     <label className="flex items-center mt-2">
@@ -199,9 +255,21 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
                     </label>
                   </div>
                 </div>
+                {/* Location input full width below the grid */}
+                <div className="mt-4">
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Location</label>
+                  <input
+                    type="text"
+                    value={localExps.find(e => e.id === experience.id)?.location || ''}
+                    onChange={e => updateExperience(experience.id, 'location', e.target.value)}
+                    onBlur={() => blurExperience(experience.id)}
+                    className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder="e.g. New York, NY or Remote"
+                  />
+                </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
                     Job Description
                   </label>
                   <textarea
@@ -209,14 +277,14 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
                     onChange={(e) => updateExperience(experience.id, 'description', e.target.value)}
                     onBlur={() => blurExperience(experience.id)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+                    className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
                     placeholder="Brief description of your role and responsibilities..."
                   />
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-medium text-gray-700">
                       Key Achievements
                     </label>
                     <button
@@ -234,8 +302,8 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
                           value={achievement}
                           onChange={(e) => updateAchievement(experience.id, index, e.target.value)}
                           onBlur={() => blurExperience(experience.id)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                          placeholder="• Describe a specific achievement with metrics when possible"
+                          className="flex-1 text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                          placeholder="Describe a specific achievement with metrics when possible"
                         />
                         {(localExps.find(e => e.id === experience.id)?.achievements || []).length > 1 && (
                           <button
@@ -251,7 +319,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
                     Relevant Skills (comma-separated)
                   </label>
                   <input
@@ -259,7 +327,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
                     value={(localExps.find(e => e.id === experience.id)?.skills || []).join(', ')}
                     onChange={e => updateExperience(experience.id, 'skills', e.target.value.split(',').map(s => s.trim()).filter(s => s))}
                     onBlur={() => blurExperience(experience.id)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                     placeholder="React, TypeScript, Node.js, AWS, Project Management"
                   />
                 </div>
