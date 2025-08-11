@@ -6,6 +6,8 @@ import { PersonalInfoForm } from './PersonalInfoForm';
 import { EducationForm } from './EducationForm';
 import { ExperienceForm } from './ExperienceForm';
 import { SkillsForm } from './SkillsForm';
+import { CertificationsForm } from './CertificationsForm';
+import { LanguagesForm } from './LanguagesForm';
 import html2pdf from 'html2pdf.js';
 import { generateResumeSections, CandidateDetails } from '../services/geminiService';
 import { ResumeService } from '../services/resumeService';
@@ -111,6 +113,22 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
   const [education, setEducation] = useState(tailoredResume ? [...tailoredResume.resumeData.education] : [...resumeData.education]);
   const [experiences, setExperiences] = useState(tailoredResume ? [...tailoredResume.resumeData.experiences] : [...resumeData.experiences]);
   const [skills, setSkills] = useState(tailoredResume ? [...tailoredResume.resumeData.skills] : [...resumeData.skills]);
+  const [certifications, setCertifications] = useState(
+    tailoredResume ? [...tailoredResume.resumeData.certifications] : [...resumeData.certifications]
+  );
+  // Keep certifications in sync with resumeData.certifications if not editing an existing tailored resume
+  useEffect(() => {
+    if (!tailoredResume) {
+      setCertifications([...resumeData.certifications]);
+    }
+  }, [resumeData.certifications, tailoredResume]);
+  const [languages, setLanguages] = useState(tailoredResume ? [...tailoredResume.resumeData.languages] : [...resumeData.languages]);
+  // Keep languages in sync with resumeData.languages if not editing an existing tailored resume
+  useEffect(() => {
+    if (!tailoredResume) {
+      setLanguages([...resumeData.languages]);
+    }
+  }, [resumeData.languages, tailoredResume]);
   const [jobTitle, setJobTitle] = useState(tailoredResume?.jobTitle || '');
   const [company, setCompany] = useState(tailoredResume?.company || '');
   const [jobDescription, setJobDescription] = useState(
@@ -134,6 +152,8 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
     education: true,
     experience: true,
     skills: true,
+    certifications: true,
+    languages: true,
     job: true,
   });
 
@@ -146,15 +166,15 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
     icon?: React.ReactNode;
     required?: boolean;
   }> = ({ id, title, children, className = '', icon, required }) => (
-    <div className={className + ' border-b last:border-b-0 pb-4 mb-4 last:mb-0 last:pb-0'}>
+    <div className={className + ' border-b last:border-b-0 pb-2 mb-2 last:mb-0 last:pb-0'}>
       <button
         type="button"
-        className="flex items-center w-full gap-2 py-2 px-0 group focus:outline-none"
+        className="flex items-center w-full gap-2 pb-1.5 px-0 group focus:outline-none"
         onClick={() => setExpandedSections(s => ({ ...s, [id]: !s[id] }))}
         aria-expanded={expandedSections[id]}
       >
         {icon}
-        <span className="text-md font-semibold text-gray-900 flex-1 text-left">{title}{required && <span className="text-red-500 ml-1">*</span>}</span>
+        <span className="text-sm font-semibold text-gray-900 flex-1 text-left">{title}{required && <span className="text-red-500 ml-1">*</span>}</span>
         {expandedSections[id] ? (
           <ChevronDown className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-transform" />
         ) : (
@@ -500,6 +520,18 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
             <SkillsForm skills={skills} onChange={setSkills} />
           </ExpandableSection>
           <ExpandableSection
+            id="certifications"
+            title="Licenses & Certifications"
+          >
+            <CertificationsForm certifications={certifications} onChange={setCertifications} />
+          </ExpandableSection>
+          <ExpandableSection
+            id="languages"
+            title="Languages"
+          >
+            <LanguagesForm languages={languages} onChange={setLanguages} />
+          </ExpandableSection>
+          <ExpandableSection
             id="job"
             title={<span>Job Details <span className='text-xs text-gray-400'>(Optional)</span></span>}
             
@@ -586,7 +618,7 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
           )} */}
         </div>
         {/* Right Column: Resume Preview */}
-        <div className="flex-1 min-w-0 max-w-[900px] ml-[340px] flex items-start justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 h-[calc(100vh-64px)] overflow-auto">
+        <div className="flex-1 min-w-0 max-w-[900px] ml-[340px] flex items-start justify-center  overflow-auto">
           <div className="w-full max-w-3xl bg-white border border-gray-200 rounded-2xl shadow-lg p-8 mt-0 mb-8 flex items-center justify-center min-h-[80vh]">
             {fetchingCandidate ? (
               <div className="flex items-center justify-center h-full w-full">
@@ -600,7 +632,9 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
                   personalInfo,
                   education,
                   experiences,
-                  skills
+                  skills,
+                  certifications,
+                  languages,
                 }}
                 jobTitle={jobTitle}
                 company={company}

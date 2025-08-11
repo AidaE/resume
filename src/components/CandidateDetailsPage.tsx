@@ -3,7 +3,9 @@ import { PersonalInfoForm } from './PersonalInfoForm';
 import { ExperienceForm } from './ExperienceForm';
 import { SkillsForm } from './SkillsForm';
 import { EducationForm } from './EducationForm';
-import { ResumeData, PersonalInfo, Experience, Skill, Education } from '../types/resume';
+import { CertificationsForm } from './CertificationsForm';
+import { LanguagesForm } from './LanguagesForm';
+import { ResumeData, PersonalInfo, Experience, Skill, Education, Certification, Language } from '../types/resume';
 import { ArrowLeft, User, Briefcase, Code, GraduationCap, Award, Languages } from 'lucide-react';
 
 interface CandidateDetailsPageProps {
@@ -12,6 +14,8 @@ interface CandidateDetailsPageProps {
   onExperiencesChange: (experiences: Experience[]) => void;
   onEducationChange: (education: Education[]) => void;
   onSkillsChange: (skills: Skill[]) => void;
+  onCertificationsChange: (certifications: Certification[]) => void;
+  onLanguagesChange: (languages: Language[]) => void;
   onBack: () => void;
   onSave: () => void; // Added onSave prop
 }
@@ -22,16 +26,20 @@ export const CandidateDetailsPage: React.FC<CandidateDetailsPageProps> = ({
   onExperiencesChange,
   onEducationChange,
   onSkillsChange,
+  onCertificationsChange,
+  onLanguagesChange,
   onBack,
   onSave
 }) => {
-  const [activeSection, setActiveSection] = React.useState<'personal' | 'experience' | 'education' | 'skills'>('personal');
+  const [activeSection, setActiveSection] = React.useState<'personal' | 'experience' | 'education' | 'skills' | 'certifications' | 'languages'>('personal');
 
   const sections = [
     { id: 'personal' as const, label: 'Personal Info', icon: User },
     { id: 'experience' as const, label: 'Experience', icon: Briefcase },
     { id: 'education' as const, label: 'Education', icon: GraduationCap },
     { id: 'skills' as const, label: 'Skills', icon: Code },
+    { id: 'certifications' as const, label: 'Licenses & Certifications', icon: Award },
+    { id: 'languages' as const, label: 'Languages', icon: Languages },
   ];
 
   return (
@@ -92,6 +100,20 @@ export const CandidateDetailsPage: React.FC<CandidateDetailsPageProps> = ({
             <SkillsForm
               skills={resumeData.skills}
               onChange={onSkillsChange}
+            />
+          )}
+
+          {activeSection === 'certifications' && (
+            <CertificationsForm
+              certifications={resumeData.certifications}
+              onChange={onCertificationsChange}
+            />
+          )}
+
+          {activeSection === 'languages' && (
+            <LanguagesForm
+              languages={resumeData.languages}
+              onChange={onLanguagesChange}
             />
           )}
         </div>

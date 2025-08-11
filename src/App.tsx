@@ -104,6 +104,14 @@ function App() {
     setResumeData(prev => ({ ...prev, skills }));
   };
 
+  const handleCertificationsChange = (certifications: Certification[]) => {
+    setResumeData(prev => ({ ...prev, certifications }));
+  };
+
+  const handleLanguagesChange = (languages: Language[]) => {
+    setResumeData(prev => ({ ...prev, languages }));
+  };
+
   const savePersonalInfo = async (personalInfo: PersonalInfo) => {
     setSaving(true);
     try {
@@ -327,7 +335,7 @@ function App() {
                   </>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <img src="/logo.png" alt="App Logo" className="w-8 h-8 object-contain rounded-xl" />
+                    <img src="/logo.png" alt="App Logo" className="w-7 h-7 object-contain" />
                   </div>
                 )}
                 <div className="flex items-center gap-4">
@@ -387,6 +395,8 @@ function App() {
                 onExperiencesChange={handleExperiencesChange}
                 onEducationChange={handleEducationChange}
                 onSkillsChange={handleSkillsChange}
+                onCertificationsChange={handleCertificationsChange}
+                onLanguagesChange={handleLanguagesChange}
                 onBack={handleBackToHome}
                 onSave={handleSaveAll}
               />

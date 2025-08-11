@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Experience } from '../types/resume';
-import { Briefcase, Plus, X, Calendar, Building } from 'lucide-react';
+import { Briefcase, Plus, X, Calendar, Building, Pencil } from 'lucide-react';
 // Remove react-datepicker and date-fns imports
 
 interface ExperienceFormProps {
@@ -12,6 +12,14 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [localExps, setLocalExps] = useState(experiences);
   React.useEffect(() => { setLocalExps(experiences); }, [experiences]);
+
+  const [skillsState, setSkillsState] = useState<{
+    [expId: string]: {
+      newSkill: string;
+      editingSkillIdx?: number;
+      editingSkillValue?: string;
+    };
+  }>({});
 
   const addExperience = () => {
     const newExperience: Experience = {
@@ -320,16 +328,146 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ experiences, onC
 
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
-                    Relevant Skills (comma-separated)
+                    Relevant Skills
                   </label>
-                  <input
-                    type="text"
-                    value={(localExps.find(e => e.id === experience.id)?.skills || []).join(', ')}
-                    onChange={e => updateExperience(experience.id, 'skills', e.target.value.split(',').map(s => s.trim()).filter(s => s))}
-                    onBlur={() => blurExperience(experience.id)}
-                    className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    placeholder="React, TypeScript, Node.js, AWS, Project Management"
-                  />
+                  <div className="flex gap-2 flex-wrap mb-2">
+                    <input
+                      type="text"
+                      value={skillsState[experience.id]?.newSkill || ''}
+                      onChange={e => {
+                        setSkillsState(s => ({
+                          ...s,
+                          [experience.id]: {
+                            ...s[experience.id],
+                            newSkill: e.target.value
+                          }
+                        }));
+                      }}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          const exp = localExps.find(e => e.id === experience.id);
+                          const newSkill = skillsState[experience.id]?.newSkill;
+                          if (exp && newSkill && newSkill.trim()) {
+                            const updatedSkills = [...(exp.skills || []), newSkill.trim()];
+                            // Update local state
+                            updateExperience(experience.id, 'skills', updatedSkills);
+                            // Immediately update parent
+                            const updatedExps = localExps.map(e => e.id === experience.id ? { ...e, skills: updatedSkills } : e);
+                            setLocalExps(updatedExps);
+                            onChange(updatedExps);
+                            // Clear newSkill
+                            setSkillsState(s => ({
+                              ...s,
+                              [experience.id]: { ...s[experience.id], newSkill: '' }
+                            }));
+                          }
+                        }
+                      }}
+                      placeholder="Add a skill..."
+                      className="flex-1 min-w-48 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    {(localExps.find(e => e.id === experience.id)?.skills || []).map((skill, idx) => {
+                      const editingSkillIdx = skillsState[experience.id]?.editingSkillIdx;
+                      const editingSkillValue = skillsState[experience.id]?.editingSkillValue || '';
+                      return (
+                        <div key={idx} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 min-w-0">
+                          {editingSkillIdx === idx ? (
+                            <input
+                              type="text"
+                              className="font-medium text-sm text-gray-900 flex-1 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              value={editingSkillValue}
+                              autoFocus
+                              onChange={e => {
+                                setSkillsState(s => ({
+                                  ...s,
+                                  [experience.id]: {
+                                    ...s[experience.id],
+                                    editingSkillValue: e.target.value
+                                  }
+                                }));
+                              }}
+                              onBlur={() => {
+                                if (editingSkillValue && editingSkillValue.trim() && editingSkillIdx !== undefined) {
+                                  const updatedSkills = (localExps.find(e => e.id === experience.id)?.skills || []).map((s, i) => i === editingSkillIdx ? editingSkillValue.trim() : s);
+                                  updateExperience(experience.id, 'skills', updatedSkills);
+                                  const updatedExps = localExps.map(e => e.id === experience.id ? { ...e, skills: updatedSkills } : e);
+                                  setLocalExps(updatedExps);
+                                  onChange(updatedExps);
+                                  setSkillsState(s => ({
+                                    ...s,
+                                    [experience.id]: { ...s[experience.id], editingSkillIdx: undefined, editingSkillValue: '' }
+                                  }));
+                                } else {
+                                  setSkillsState(s => ({
+                                    ...s,
+                                    [experience.id]: { ...s[experience.id], editingSkillIdx: undefined, editingSkillValue: '' }
+                                  }));
+                                }
+                              }}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                  if (editingSkillValue && editingSkillValue.trim() && editingSkillIdx !== undefined) {
+                                    const updatedSkills = (localExps.find(e => e.id === experience.id)?.skills || []).map((s, i) => i === editingSkillIdx ? editingSkillValue.trim() : s);
+                                    updateExperience(experience.id, 'skills', updatedSkills);
+                                    const updatedExps = localExps.map(e => e.id === experience.id ? { ...e, skills: updatedSkills } : e);
+                                    setLocalExps(updatedExps);
+                                    onChange(updatedExps);
+                                    setSkillsState(s => ({
+                                      ...s,
+                                      [experience.id]: { ...s[experience.id], editingSkillIdx: undefined, editingSkillValue: '' }
+                                    }));
+                                  }
+                                } else if (e.key === 'Escape') {
+                                  setSkillsState(s => ({
+                                    ...s,
+                                    [experience.id]: { ...s[experience.id], editingSkillIdx: undefined, editingSkillValue: '' }
+                                  }));
+                                }
+                              }}
+                            />
+                          ) : (
+                            <span
+                              className="font-medium text-sm text-gray-900 flex-1 group cursor-pointer flex items-center"
+                              onClick={() => {
+                                setSkillsState(s => ({
+                                  ...s,
+                                  [experience.id]: { ...s[experience.id], editingSkillIdx: idx, editingSkillValue: skill }
+                                }));
+                              }}
+                            >
+                              {skill}
+                              <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Pencil className="w-3 h-3 text-gray-300 hover:text-gray-500" onClick={e => {
+                                  e.stopPropagation();
+                                  setSkillsState(s => ({
+                                    ...s,
+                                    [experience.id]: { ...s[experience.id], editingSkillIdx: idx, editingSkillValue: skill }
+                                  }));
+                                }} />
+                              </span>
+                            </span>
+                          )}
+                          <button
+                            onClick={() => {
+                              const exp = localExps.find(e => e.id === experience.id);
+                              if (exp) {
+                                const updatedSkills = exp.skills.filter((_, i) => i !== idx);
+                                updateExperience(experience.id, 'skills', updatedSkills);
+                                const updatedExps = localExps.map(e => e.id === experience.id ? { ...e, skills: updatedSkills } : e);
+                                setLocalExps(updatedExps);
+                                onChange(updatedExps);
+                              }
+                            }}
+                            className="text-gray-400 text-sm hover:text-red-500 transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
