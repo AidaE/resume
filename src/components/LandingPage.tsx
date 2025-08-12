@@ -31,8 +31,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const currentPricing = pricing[billingCycle];
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-            {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200 rounded-b-2xl w-[800px] mx-auto">
+                  {/* Header */}
+      <header className="absolute top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200 rounded-b-2xl w-full md:w-[800px] md:mx-auto">
         <div className="w-full px-4">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3 ml-1.5">
@@ -61,9 +61,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   onClick={onGetStarted}
                   className="flex items-center gap-2.5 pl-4 pr-3 py-2.5 bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-colors"
                 >
-                
+                  
                   Build resumes
-              
+                  
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-white text-black transition-colors duration-300 group-hover:bg-black group-hover:text-white">
             <ArrowRight className="w-4 h-4" />
           </span>
