@@ -59,7 +59,7 @@ export const CandidateDetailsPage: React.FC<CandidateDetailsPageProps> = ({
                   onClick={() => setActiveSection(section.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg transition-colors ${
                     activeSection === section.id
-                      ? 'bg-blue-600 text-white shadow-sm'
+                      ? 'bg-gray-800 text-white shadow-sm'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >

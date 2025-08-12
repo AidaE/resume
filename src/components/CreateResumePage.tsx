@@ -1,7 +1,7 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { ResumeData, TailoredResume, Skill } from '../types/resume';
-import { ResumePreview } from './ResumePreview';
-import { ArrowLeft, Target, Sparkles, FileText, Building, AlertCircle, ChevronDown, ChevronRight, GraduationCap, Download } from 'lucide-react';
+import { ResumePreview, ResumeTemplate } from './ResumePreview';
+import { ArrowLeft, Target, Sparkles, FileText, Building, AlertCircle, ChevronDown, ChevronRight, GraduationCap, Download, Palette, Save } from 'lucide-react';
 import { PersonalInfoForm } from './PersonalInfoForm';
 import { EducationForm } from './EducationForm';
 import { ExperienceForm } from './ExperienceForm';
@@ -74,7 +74,7 @@ const JobDetailsForm: React.FC<JobDetailsFormProps & { jobDescEdited: boolean; s
   );
 };
 
-interface EditResumePageProps {
+interface CreateResumePageProps {
   resumeData: ResumeData;
   onCreateResume?: (tailoredResume: TailoredResume) => void;
   onUpdateResume?: (tailoredResume: TailoredResume) => void;
@@ -90,25 +90,7 @@ interface EditResumePageProps {
   onHeaderResumeTitleChange?: (title: string) => void;
 }
 
-export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({ resumeData, onCreateResume, onUpdateResume, onBack, saveError, onDismissError, tailoredResume, saveRef, exportPdfRef, defaultResumeTitle, jobDescriptionFromModal, headerResumeTitle, onHeaderResumeTitleChange }, ref) => {
-  const [resumeTitle, setResumeTitle] = useState(
-    tailoredResume?.resumeTitle || defaultResumeTitle || ''
-  );
-
-  // Sync with header resume title
-  useEffect(() => {
-    if (headerResumeTitle && headerResumeTitle !== resumeTitle) {
-      setResumeTitle(headerResumeTitle);
-    }
-  }, [headerResumeTitle, resumeTitle]);
-
-  // Update header when local title changes
-  const updateResumeTitle = (newTitle: string) => {
-    setResumeTitle(newTitle);
-    if (onHeaderResumeTitleChange) {
-      onHeaderResumeTitleChange(newTitle);
-    }
-  };
+export const CreateResumePage = forwardRef<HTMLDivElement, CreateResumePageProps>(({ resumeData, onCreateResume, onUpdateResume, onBack, saveError, onDismissError, tailoredResume, saveRef, exportPdfRef, defaultResumeTitle, jobDescriptionFromModal, headerResumeTitle, onHeaderResumeTitleChange }, ref) => {
   const [personalInfo, setPersonalInfo] = useState(tailoredResume ? { ...tailoredResume.resumeData.personalInfo } : { ...resumeData.personalInfo });
   const [education, setEducation] = useState(tailoredResume ? [...tailoredResume.resumeData.education] : [...resumeData.education]);
   const [experiences, setExperiences] = useState(tailoredResume ? [...tailoredResume.resumeData.experiences] : [...resumeData.experiences]);
@@ -145,6 +127,8 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
   const [summary, setSummary] = useState<string>('');
   const [isSummaryLoading, setIsSummaryLoading] = useState<boolean>(false);
   const [jobDescEdited, setJobDescEdited] = useState(false);
+  const [template, setTemplate] = useState<ResumeTemplate>('modern');
+  const [resumeTitle, setResumeTitle] = useState(headerResumeTitle || defaultResumeTitle || 'New Resume');
 
   // Expand/collapse state for each section
   const [expandedSections, setExpandedSections] = useState({
@@ -442,6 +426,37 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
     }
   }, []);
 
+  // Template Selector Component
+  const TemplateSelector = () => (
+    <div className="mb-6">
+      <div className="flex items-center gap-2 mb-3">
+        <Palette className="w-4 h-4 text-gray-600" />
+        <h3 className="text-sm font-medium text-gray-900">Resume Template</h3>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {[
+          { id: 'modern' as ResumeTemplate, name: 'Modern', description: 'Clean and professional' },
+          { id: 'classic' as ResumeTemplate, name: 'Classic', description: 'Traditional with teal accent' },
+          { id: 'minimal' as ResumeTemplate, name: 'Minimal', description: 'Simple and centered' },
+          { id: 'professional' as ResumeTemplate, name: 'Professional', description: 'Two-column layout' }
+        ].map((templateOption) => (
+          <button
+            key={templateOption.id}
+            onClick={() => setTemplate(templateOption.id)}
+            className={`p-3 text-left border rounded-lg transition-colors ${
+              template === templateOption.id
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            <div className="font-medium text-sm text-gray-900">{templateOption.name}</div>
+            <div className="text-xs text-gray-500">{templateOption.description}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       {/* Error Alert */}
@@ -485,15 +500,15 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
         </div>
       )}
       <div className="flex h-[calc(100vh-64px)]">
-        {/* Left Column: Resume Title, Candidate Details, Job Details, Actions */}
-        <div className="w-[340px] bg-white border-r border-gray-200 shadow-sm space-y-4 flex-shrink-0 overflow-y-auto fixed left-0 top-[64px] bottom-0 h-[calc(100vh-64px)] p-6">
-          {/* Resume Title (always visible, not expandable) */}
-           
-          {/* Resume Title (always visible, or could be collapsible if desired) */}
+        {/* Left Column: Resume Title, Template Selector, Candidate Details, Job Details, Actions */}
+        <div className="w-[340px] bg-white border-r border-gray-200 shadow-sm space-y-4 flex-shrink-0 overflow-y-auto fixed left-0 top-[64px] bottom-0 h-[calc(100vh-64px)] p-6 mt-2">
+          
+          {/* Template Selector */}
+          <TemplateSelector />
+
           <ExpandableSection
             id="personal"
             title="Personal Information"
-            
             required
           >
             <PersonalInfoForm data={personalInfo} onChange={setPersonalInfo} />
@@ -501,21 +516,18 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
           <ExpandableSection
             id="education"
             title="Education"
-            
           >
             <EducationForm education={education} onChange={setEducation} />
           </ExpandableSection>
           <ExpandableSection
             id="experience"
             title="Work Experience"
-           
           >
             <ExperienceForm experiences={experiences} onChange={setExperiences} />
           </ExpandableSection>
           <ExpandableSection
             id="skills"
             title="Skills & Technologies"
-            
           >
             <SkillsForm skills={skills} onChange={setSkills} />
           </ExpandableSection>
@@ -533,8 +545,7 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
           </ExpandableSection>
           <ExpandableSection
             id="job"
-            title={<span>Job Details <span className='text-xs text-gray-400'>(Optional)</span></span>}
-            
+            title={<span>Job Details <span className='text-xs text-gray-400'></span></span>}
           >
             <JobDetailsForm
               jobTitle={jobTitle}
@@ -546,101 +557,102 @@ export const EditResumePage = forwardRef<HTMLDivElement, EditResumePageProps>(({
               jobDescEdited={jobDescEdited}
               setJobDescEdited={setJobDescEdited}
             />
+            {/* Regenerate button moved here */}
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={generatePreview}
+                disabled={!resumeTitle.trim() || isGenerating || isProfileIncomplete || !jobDescEdited}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-xl hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              >
+                {isGenerating ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Regenerate
+                  </>
+                )}
+              </button>
+            </div>
           </ExpandableSection>
-          {/* Actions (Generate Preview, etc.) remain outside sections */}
-          <div className="flex gap-3 pt-4">
-            <button
-              onClick={generatePreview}
-              disabled={!resumeTitle.trim() || isGenerating || isProfileIncomplete || !jobDescEdited}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-xl hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              {isGenerating ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                   Regenerate
-                </>
-              )}
-            </button>
-            {/* 
-            <button onClick={handleGenerate} disabled={loading || !candidate} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
-              {loading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Target className="w-4 h-4" />
-                  Sections
-                </>
-              )}
-            </button> */}
-          </div>
-          
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-medium text-red-900 mb-1">Error</h4>
-                  <p className="text-sm text-red-800">{error}</p>
-                </div>
-              </div>
-            </div>
-          )}
-          {aiSections && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
-              <div className="flex items-start gap-3">
-                <Sparkles className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-medium text-green-900 mb-1">AI-Generated Resume Sections</h4>
-                  <pre className="text-sm text-green-800 whitespace-pre-wrap break-words">
-                    {aiSections}
-                  </pre>
-                </div>
-              </div>
-            </div>
-          )}
-          {/* {(summary || isSummaryLoading) && (
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">Professional Summary</h2>
-              {isSummaryLoading ? (
-                <p className="text-gray-500 italic">Generating summary...</p>
-              ) : (
-                <p className="text-gray-800 whitespace-pre-line">{summary}</p>
-              )}
-            </div>
-          )} */}
         </div>
+
         {/* Right Column: Resume Preview */}
-        <div className="flex-1 min-w-0 max-w-[900px] ml-[340px] flex items-start justify-center  overflow-auto">
-          <div className="w-full max-w-3xl bg-white border border-gray-200 rounded-2xl shadow-lg p-8 mt-0 mb-8 flex items-center justify-center min-h-[80vh]">
-            {fetchingCandidate ? (
-              <div className="flex items-center justify-center h-full w-full">
-                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                <span className="ml-3 text-lg text-gray-600">Loading candidate details...</span>
-              </div>
-            ) : (
-              <ResumePreview
-                resumeData={{
-                  ...resumeData,
-                  personalInfo,
-                  education,
-                  experiences,
-                  skills,
-                  certifications,
-                  languages,
+        <div className="flex-1 ml-[340px] p-4">
+          <div className="flex justify-between items-center mb-6">
+            {/* <div className="flex-1">
+              <input
+                type="text"
+                value={resumeTitle}
+                onChange={(e) => {
+                  setResumeTitle(e.target.value);
+                  onHeaderResumeTitleChange?.(e.target.value);
                 }}
-                jobTitle={jobTitle}
-                company={company}
-                matchedSkills={previewData?.matchedSkills || []}
+                placeholder="Resume Title"
+                className="text-2xl font-bold text-gray-900 bg-transparent border-none outline-none w-full"
               />
-            )}
+            </div> */}
+            {/* <div className="flex gap-3">
+              <button
+                onClick={handleSave}
+                disabled={!resumeTitle.trim() || isProfileIncomplete}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              >
+                <Save className="w-4 h-4" />
+                Save
+              </button>
+              <button
+                onClick={() => {
+                  const element = document.querySelector('.resume-print-area');
+                  if (element) {
+                    html2pdf().set({
+                      margin: [0.5, 0.5, 0.5, 0.5], // Add some margin for better appearance
+                      filename: 'resume.pdf',
+                      jsPDF: { 
+                        unit: 'in', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true,
+                        putOnlyUsedFonts: true
+                      },
+                      // Use html2pdf renderer for selectable text instead of html2canvas
+                      html2canvas: false,
+                      imageTimeout: 0,
+                      removeContainer: true,
+                      // Enable better text rendering
+                      enableLinks: true,
+                      // Add font embedding for better text support
+                      fontEmbedding: true
+                    }).from(element).save();
+                  }
+                }}
+                disabled={!resumeTitle.trim() || isProfileIncomplete}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Export PDF
+              </button>
+            </div> */}
+          </div>
+
+          <div ref={ref} className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <ResumePreview
+              resumeData={{
+                personalInfo,
+                education,
+                experiences,
+                skills,
+                certifications,
+                languages
+              }}
+              jobTitle={jobTitle}
+              company={company}
+              matchedSkills={previewData?.matchedSkills || []}
+              template={template}
+            />
           </div>
         </div>
       </div>

@@ -140,23 +140,7 @@ const CardWithMenu: FC<CardWithMenuProps> = ({ resume, onViewResume, onDeleteRes
               </div>
 
               {/* Skill tags */}
-              {resume.matchedSkills.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {resume.matchedSkills.slice(0, 6).map((skill: string, index: number) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                  {resume.matchedSkills.length > 6 && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                      +{resume.matchedSkills.length - 6} more
-                    </span>
-                  )}
-                </div>
-              )}
+              
             </div>
           </div>
         </div>

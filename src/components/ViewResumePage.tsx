@@ -1,6 +1,6 @@
 import React from 'react';
 import { TailoredResume } from '../types/resume';
-import { EditResumePage } from './CreateResumePage';
+import { CreateResumePage } from './CreateResumePage';
 
 interface ViewResumePageProps {
   resume: TailoredResume;
@@ -14,7 +14,7 @@ interface ViewResumePageProps {
 
 export const ViewResumePage: React.FC<ViewResumePageProps> = ({ resume, onBack, onUpdateResume, saveError, onDismissError, saveRef, exportPdfRef }) => {
   return (
-    <EditResumePage
+            <CreateResumePage
       resumeData={resume.resumeData}
       tailoredResume={resume}
       onUpdateResume={onUpdateResume}

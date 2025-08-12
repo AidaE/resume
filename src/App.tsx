@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { AuthWrapper } from './components/AuthWrapper';
+import { LandingPage } from './components/LandingPage';
 import { HomePage } from './components/HomePage';
 import { CandidateDetailsPage } from './components/CandidateDetailsPage';
-import { EditResumePage } from './components/CreateResumePage';
+import { CreateResumePage } from './components/CreateResumePage';
 import { ViewResumePage } from './components/ViewResumePage';
 import { ResumeData, TailoredResume, PersonalInfo, Experience, Education, Skill, Certification, Language } from './types/resume';
 import { ResumeService } from './services/resumeService';
@@ -11,8 +12,9 @@ import { FileText, LogOut, User as UserIcon, Download, ArrowLeft, Shield } from 
 import { User } from '@supabase/supabase-js';
 import html2pdf from 'html2pdf.js';
 import { SecurityTest } from './components/SecurityTest';
+import { extractCompanyAndJobTitle } from './services/openaiService';
 
-type AppScreen = 'home' | 'candidate-details' | 'create-resume' | 'view-resume' | 'security-test';
+type AppScreen = 'landing' | 'home' | 'candidate-details' | 'create-resume' | 'view-resume' | 'security-test';
 
 const initialPersonalInfo: PersonalInfo = {
   fullName: '',
@@ -33,7 +35,7 @@ const initialResumeData: ResumeData = {
 };
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<AppScreen>('home');
+  const [currentScreen, setCurrentScreen] = useState<AppScreen>('landing');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [resumeData, setResumeData] = useState<ResumeData>(initialResumeData);
   const [tailoredResumes, setTailoredResumes] = useState<TailoredResume[]>([]);
@@ -176,6 +178,19 @@ function App() {
     setViewingResume(null);
   };
 
+  const handleGetStarted = () => {
+    if (currentUser) {
+      setCurrentScreen('home');
+    } else {
+      // This will trigger the AuthWrapper to show login/signup
+      setCurrentScreen('home');
+    }
+  };
+
+  const handleGoToResumes = () => {
+    setCurrentScreen('home');
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     // Clear cached data
@@ -206,13 +221,57 @@ function App() {
   };
 
   // When modal is submitted or skipped
-  const handleJobDescModalDone = (desc: string) => {
+  const handleJobDescModalDone = async (desc: string) => {
     setJobDescForResume(desc);
     setShowJobDescModal(false);
     setCurrentScreen('create-resume');
     setPendingCreateResume(false);
-    
+
     // Set the default resume title
+    if (desc.trim()) {
+      try {
+        const { company, jobTitle } = await extractCompanyAndJobTitle(desc);
+        let baseTitle = '';
+        if (jobTitle && company) {
+          baseTitle = `${jobTitle} | ${company}`;
+        } else if (jobTitle) {
+          baseTitle = jobTitle;
+        } else if (company) {
+          baseTitle = company;
+        }
+        if (baseTitle) {
+          // Check for existing resumes with this title
+          const existingTitles = tailoredResumes
+            .map(r => r.resumeTitle)
+            .filter((title): title is string => title !== undefined && title.startsWith(baseTitle));
+          let finalTitle = baseTitle;
+          if (existingTitles.length > 0) {
+            // Find the highest number in parentheses
+            let maxNum = 1;
+            existingTitles.forEach(title => {
+              const match = title.match(/\((\d+)\)$/);
+              if (match) {
+                const num = parseInt(match[1], 10);
+                if (num > maxNum) maxNum = num;
+              } else if (title === baseTitle) {
+                if (maxNum < 1) maxNum = 1;
+              }
+            });
+            // If baseTitle exists without a number, next is (2)
+            if (existingTitles.some(title => title === baseTitle)) {
+              finalTitle = `${baseTitle} (${maxNum + 1})`;
+            } else {
+              finalTitle = `${baseTitle} (2)`;
+              if (maxNum > 1) finalTitle = `${baseTitle} (${maxNum + 1})`;
+            }
+          }
+          setResumeTitle(finalTitle);
+          return;
+        }
+      } catch (e) {
+        // fallback below
+      }
+    }
     const baseName = 'New Resume';
     const existingNumbers = tailoredResumes
       .map(r => r.resumeTitle)
@@ -231,6 +290,17 @@ function App() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
+    );
+  }
+
+  // Show landing page for non-authenticated users
+  if (!currentUser && currentScreen === 'landing') {
+    return (
+      <LandingPage
+        currentUser={currentUser}
+        onGetStarted={handleGetStarted}
+        onGoToResumes={handleGoToResumes}
+      />
     );
   }
 
@@ -377,8 +447,17 @@ function App() {
           </header>
 
           {/* Main Content */}
-          <div className="max-w-7xl mx-auto px-4 py-6">
-            {currentScreen === 'home' && (
+          {currentScreen === 'landing' && (
+            <LandingPage
+              currentUser={currentUser}
+              onGetStarted={handleGetStarted}
+              onGoToResumes={handleGoToResumes}
+            />
+          )}
+
+          {currentScreen !== 'landing' && (
+            <div className="max-w-7xl mx-auto px-4 py-6">
+              {currentScreen === 'home' && (
               <HomePage
                 tailoredResumes={tailoredResumes}
                 onCreateResume={handleStartCreateResume}
@@ -417,7 +496,7 @@ function App() {
                 const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
                 const defaultTitle = `${baseName} ${nextNumber}`;
                 return (
-                  <EditResumePage
+                  <CreateResumePage
                     resumeData={resumeData}
                     onCreateResume={handleTailorResume}
                     onBack={handleBackToHome}
@@ -459,6 +538,7 @@ function App() {
               <SecurityTest />
             )}
           </div>
+        )}
         </div>
       </AuthWrapper>
     </>
