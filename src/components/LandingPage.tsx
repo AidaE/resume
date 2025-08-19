@@ -32,7 +32,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
                   {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200 rounded-b-2xl w-full md:w-[800px] md:mx-auto">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 rounded-b-2xl w-full md:w-[800px] md:mx-auto">
         <div className="w-full px-4">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3 ml-1.5">
@@ -59,7 +59,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               ) : (
                 <button
                   onClick={onGetStarted}
-                  className="flex items-center gap-2.5 pl-4 pr-3 py-2.5 bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-colors"
+                  className="flex items-center text-sm gap-2.5 pl-4 pr-3 py-2 bg-[#25ABFF] text-white rounded-xl hover:bg-gray-900 transition-colors"
                 >
                   
                   Build resumes
@@ -85,7 +85,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-black mb-6">
-            Stop Sending Generic CVs.
+            Stop sending generic CVs.
               <span className="text-black-300 block mt-2">Land your dream job.</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
@@ -109,6 +109,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
         </div>
       </section>
+
+
+{/* ATS Inline Statement with Popover */}
+<section className="relative bg-white py-16 md:py-24 pb-48">
+  <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-40">
+    {/* Bold lead line */}
+    <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">
+      <span className="relative inline-block group">
+        The ATS
+        {/* Popover */}
+        <span className="absolute left-1/2 -translate-x-1/2 -top-14 w-64 bg-black text-white font-normal text-sm rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 transform -translate-y-2 pointer-events-none shadow-lg z-20">
+          Applicant Tracking System — software recruiters use to scan, filter, and rank resumes before a human sees them.
+        </span>
+      </span>{" "}
+      decides if your resume is seen by humans.
+    </h2>
+
+    {/* Muted follow-up with inline images (mirrors your reference style) */}
+    <p className="mt-4 text-2xl md:text-3xl leading-snug text-gray-400 font-medium">
+  70% of large employers
+  <img
+    src="/stats-1.png"
+    alt=""
+    aria-hidden="true"
+    className="inline-block w-20 h-10 md:w-24 md:h-12 rounded-full object-cover align-text-bottom mx-3 ring-2 ring-white shadow"
+  />
+  auto-reject resumes lacking ATS-friendly formatting or keywords.
+  <span className="mx-2"></span>
+  88% of employers say they lose qualified candidates
+  <img
+    src="/stats-2.png"
+    alt=""
+    aria-hidden="true"
+    className="inline-block w-20 h-10 md:w-24 md:h-12 rounded-full object-cover align-text-bottom mx-3 ring-2 ring-white shadow"
+  />
+   due to poor ATS alignment.
+</p>
+
+  </div>
+</section>
+
 
       {/* Clouds Background Section */}
       <section className="relative overflow-hidden">
