@@ -59,7 +59,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               ) : (
                 <button
                   onClick={onGetStarted}
-                  className="flex items-center text-sm gap-2.5 pl-4 pr-3 py-2 bg-[#25ABFF] text-white rounded-xl hover:bg-gray-900 transition-colors"
+                  className="flex items-center text-sm gap-2.5 pl-4 pr-3 py-2 bg-[#0894EB] text-white rounded-xl hover:bg-gray-900 transition-colors"
                 >
                   
                   Build resumes
@@ -115,34 +115,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 <section className="relative bg-white py-16 md:py-24 pb-48">
   <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-40">
     {/* Bold lead line */}
-    <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">
-      <span className="relative inline-block group">
-        The ATS
-        {/* Popover */}
-        <span className="absolute left-1/2 -translate-x-1/2 -top-14 w-64 bg-black text-white font-normal text-sm rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 transform -translate-y-2 pointer-events-none shadow-lg z-20">
-          Applicant Tracking System — software recruiters use to scan, filter, and rank resumes before a human sees them.
-        </span>
-      </span>{" "}
-      decides if your resume is seen by humans.
-    </h2>
+    <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">
+  <span className="relative inline-block group">
+  The <span className="border-b border-dashed border-gray-400">ATS</span>
+    {/* Popover */}
+    <span className="absolute left-1/2 -translate-x-1/2 -top-14 w-64 bg-black text-white font-normal text-sm rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 transform -translate-y-2 pointer-events-none shadow-lg z-20">
+      Applicant Tracking System: software recruiters use to scan, filter, and rank resumes before a human sees them.
+    </span>
+  </span>{" "}
+  decides if your resume is seen by humans.
+</h2>
+
+
 
     {/* Muted follow-up with inline images (mirrors your reference style) */}
-    <p className="mt-4 text-2xl md:text-3xl leading-snug text-gray-400 font-medium">
+    <p className="mt-4 text-2xl md:text-3xl text-gray-500 font-medium">
   70% of large employers
   <img
     src="/stats-1.png"
     alt=""
     aria-hidden="true"
-    className="inline-block w-20 h-10 md:w-24 md:h-12 rounded-full object-cover align-text-bottom mx-3 ring-2 ring-white shadow"
+     className="inline-block max-w-[60px] h-auto rounded-full object-contain align-text-bottom mx-3 ring-2 ring-white shadow"
   />
   auto-reject resumes lacking ATS-friendly formatting or keywords.
-  <span className="mx-2"></span>
+  <span className="mx-1"></span>
   88% of employers say they lose qualified candidates
   <img
     src="/stats-2.png"
     alt=""
     aria-hidden="true"
-    className="inline-block w-20 h-10 md:w-24 md:h-12 rounded-full object-cover align-text-bottom mx-3 ring-2 ring-white shadow"
+    className="inline-block max-w-[60px] h-auto rounded-full object-contain align-text-bottom mx-3 ring-2 ring-white shadow"
   />
    due to poor ATS alignment.
 </p>
@@ -166,7 +168,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         Your Career, Your Way
       </h2>
       <p className="text-gray-900 text-lg max-w-2xl mx-auto mb-20">
-        Create tailored CVs that pass ATS filters and catch recruiters’ attention — every time you apply.
+        Create tailored CVs that pass ATS filters and catch recruiters’ attention, every time you apply.
       </p>
     </div>
 
@@ -471,37 +473,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Right side - Pricing card */}
             <div className="bg-white rounded-2xl p-8 shadow-2xl">
-              {/* Toggle switch */}
-              <div className="flex items-start  mb-6">
-                <div className="bg-gray-100 rounded-full p-1 flex">
-                  <button 
-                    onClick={() => setBillingCycle('yearly')}
-                    className={`px-6 py-2 rounded-full font-medium text-sm transition-colors ${
-                      billingCycle === 'yearly' 
-                        ? 'bg-gray-800 text-white' 
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    Yearly
-                  </button>
-                  <button 
-                    onClick={() => setBillingCycle('monthly')}
-                    className={`px-6 py-2 rounded-full font-medium text-sm transition-colors ${
-                      billingCycle === 'monthly' 
-                        ? 'bg-gray-800 text-white' 
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    Monthly
-                  </button>
-                </div>
-              </div>
-
+             
               {/* Price */}
               <div className="mb-8">
                 <div className="text-4xl font-bold text-gray-800 mb-2">
-                  ${currentPricing.price}
-                  <span className="text-gray-800 text-2xl font-normal"> / {currentPricing.period}</span>
+                  $12
+                  <span className="text-gray-800 text-2xl font-normal"> / month</span>
                 </div>
                 <p className="text-gray-500 text-sm">
                   {currentPricing.description}
@@ -528,12 +505,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   
                   <span className="text-gray-700">Unlimited PDF exports</span>
                 </div>
-                <div className="flex items-center gap-3">
-                 
-                  <BadgeCheck className="w-6 h-6 text-blue-600" />
-                  
-                  <span className="text-gray-700">Priority support</span>
-                </div>
+                
               </div>
 
               {/* CTA button */}

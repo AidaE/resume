@@ -16,6 +16,7 @@ export const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [error, setError] = useState('');
+  const [signupSuccess, setSignupSuccess] = useState(false);
 
   useEffect(() => {
     // Get initial session
@@ -44,10 +45,12 @@ export const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin
+            emailRedirectTo: "https://thetailored.cv"
           }
         });
         if (error) throw error;
+        console.log('Signup successful, setting signupSuccess to true');
+        setSignupSuccess(true);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -100,99 +103,124 @@ export const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
             {/* Turquoise gradient header */}
             <div className=" p-8 pb-4">
               <div className="text-center">
-                <img 
-                  src="/logo.png" 
-                  alt="ResumeBuilder Logo"
-                  className="w-16 h-16 mx-auto mb-4"
-                />
-                <h1 className="text-2xl font-bold text-gray-900">The Tailored CV</h1>
-                <p className="text-gray-600 mt-2">
-                  {authMode === 'signin' ? 'Welcome back!' : 'Create your account'}
-                </p>
+                {signupSuccess && authMode === 'signup' ? (
+                  <div className="flex items-center justify-center gap-2 mb-0">
+                   
+                  </div>
+                ) : (
+                  <>
+                    <img 
+                      src="/logo.png" 
+                      alt="ResumeBuilder Logo"
+                      className="w-16 h-16 mx-auto mb-4"
+                    />
+                    <h1 className="text-2xl font-bold text-gray-900">The Tailored CV</h1>
+                    <p className="text-gray-600 mt-2">
+                      {authMode === 'signin' ? 'Sign in to your account' : 'Create your account'}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
             
             {/* White form section */}
             <div className="p-8 pt-4">
-              <form onSubmit={handleAuth} className="space-y-6">
-                <div>
-                  {/* <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label> */}
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full placeholder-gray-500  pl-10 pr-4 py-2.5 bg-[#F1F3F8] rounded-lg focus:ring-2 focus:ring-gray-500 focus:outline-none transition-colors"
-                      placeholder="Email address"
-                      required
+              {(() => {
+                console.log('Rendering condition check:', { signupSuccess, authMode });
+                return signupSuccess && authMode === 'signup';
+              })() ? (
+                <div className="flex flex-col items-center text-center space-y-2 pb-4">
+                  <img 
+                      src="/email3.png" 
+                      alt="Email illustration"
+                      className="w-36 h-36 mx-auto mb-6"
                     />
-                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900">Verify your email</h2>
+                  <p className="text-gray-600">We’ve sent a confirmation link to your email address.</p>
                 </div>
+              ) : (
+                <>
+                  <form onSubmit={handleAuth} className="space-y-6">
+                    <div>
+                      {/* <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address
+                      </label> */}
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full placeholder-gray-500  pl-10 pr-4 py-2.5 bg-[#F1F3F8] rounded-lg focus:ring-2 focus:ring-gray-500 focus:outline-none transition-colors"
+                          placeholder="Email address"
+                          required
+                        />
+                      </div>
+                    </div>
 
-                <div>
-                  {/* <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Password
-                  </label> */}
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full placeholder-gray-500 pl-10 pr-12 py-2.5 bg-[#F1F3F8] rounded-lg focus:ring-2 focus:ring-gray-500 focus:outline-none transition-colors"
-                      placeholder="Password"
-                      required
-                      minLength={6}
-                    />
+                    <div>
+                      {/* <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Password
+                      </label> */}
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full placeholder-gray-500 pl-10 pr-12 py-2.5 bg-[#F1F3F8] rounded-lg focus:ring-2 focus:ring-gray-500 focus:outline-none transition-colors"
+                          placeholder="Password"
+                          required
+                          minLength={6}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {error && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                        <p className="text-sm text-red-700">{error}</p>
+                      </div>
+                    )}
+
                     <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      type="submit"
+                      disabled={authLoading}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-900 disabled:bg-gray-300 transition-colors font-medium"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {authLoading ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <>
+                         
+                          {authMode === 'signin' ? 'Sign In' : 'Create Account'}
+                        </>
+                      )}
+                    </button>
+                  </form>
+
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={() => {
+                        setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
+                        setError('');
+                      }}
+                      className="text-gray-600 hover:text-gray-700 text-sm font-medium"
+                    >
+                      {authMode === 'signin' 
+                        ? "Don't have an account? Sign up" 
+                        : "Already have an account? Sign in"
+                      }
                     </button>
                   </div>
-                </div>
-
-                {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                    <p className="text-sm text-red-700">{error}</p>
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={authLoading}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-900 disabled:bg-gray-300 transition-colors font-medium"
-                >
-                  {authLoading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <>
-                     
-                      {authMode === 'signin' ? 'Sign In' : 'Create Account'}
-                    </>
-                  )}
-                </button>
-              </form>
-
-              <div className="mt-6 text-center">
-                <button
-                  onClick={() => {
-                    setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
-                    setError('');
-                  }}
-                  className="text-gray-600 hover:text-gray-700 text-sm font-medium"
-                >
-                  {authMode === 'signin' 
-                    ? "Don't have an account? Sign up" 
-                    : "Already have an account? Sign in"
-                  }
-                </button>
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { ViewResumePage } from './components/ViewResumePage';
 import { ResumeData, TailoredResume, PersonalInfo, Experience, Education, Skill, Certification, Language } from './types/resume';
 import { ResumeService } from './services/resumeService';
 import { supabase } from './lib/supabase';
-import { FileText, LogOut, User as UserIcon, Download, ArrowLeft, Shield } from 'lucide-react';
+import { FileText, LogOut, User as UserIcon, Download, ArrowLeft, Shield, ChevronDown } from 'lucide-react';
 import { User } from '@supabase/supabase-js';
 import html2pdf from 'html2pdf.js';
 import { SecurityTest } from './components/SecurityTest';
@@ -50,6 +50,25 @@ function App() {
   const [jobDescForResume, setJobDescForResume] = useState('');
   const [resumeTitle, setResumeTitle] = useState('');
   const [isEditingResumeTitle, setIsEditingResumeTitle] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.user-dropdown')) {
+        setShowUserDropdown(false);
+      }
+    };
+
+    if (showUserDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserDropdown]);
 
   // Set up auth state listener
   useEffect(() => {
@@ -338,7 +357,8 @@ function App() {
       <AuthWrapper>
         <div className="min-h-screen bg-gray-50">
           {/* Header */}
-          <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+          {currentScreen !== 'landing' && (
+            <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
             <div className="w-full px-8 py-4">
               <div className="flex items-center justify-between">
                 {currentScreen === 'candidate-details' ? (
@@ -411,20 +431,7 @@ function App() {
                 <div className="flex items-center gap-4">
                   {currentScreen === 'home' && (
                     <>
-                      <button
-                        onClick={() => setCurrentScreen('candidate-details')}
-                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-                      >
-                        <UserIcon className="w-4 h-4" />
-                        Details
-                      </button>
-                      <button
-                        onClick={handleStartCreateResume}
-                        className="flex items-center gap-2 px-4 py-2 font-regular bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-colors"
-                      >
-                        <FileText className="w-4 h-4" />
-                        Create resume
-                      </button>
+                     
                     </>
                   )}
                   {saving && (
@@ -434,17 +441,35 @@ function App() {
                     </div>
                   )}
                   {!(currentScreen === 'create-resume' || currentScreen === 'view-resume' || currentScreen === 'candidate-details') && (
-                    <button
-                      onClick={handleSignOut}
-                      className="flex items-center gap-2 px-1.5 py-1.5 text-sm rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <LogOut className="w-4 h-4" />
-                    </button>
+                    <div className="relative user-dropdown">
+                      <button
+                        onClick={() => setShowUserDropdown(!showUserDropdown)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <UserIcon className="w-4 h-4" />
+                        <ChevronDown className="w-3 h-3" />
+                      </button>
+                      {showUserDropdown && (
+                        <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                          <div className="px-4 py-3 border-b border-gray-100">
+                            <p className="text-sm font-medium text-gray-900">{currentUser?.email}</p>
+                          </div>
+                          <button
+                            onClick={handleSignOut}
+                            className="flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-gray-50 w-full text-left rounded-lg"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            Log out
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
             </div>
           </header>
+          )}
 
           {/* Main Content */}
           {currentScreen === 'landing' && (
